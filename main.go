@@ -3,27 +3,25 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
-	"strings"
+	"wetherForecast/geo"
+	"wetherForecast/wether"
 )
 
 func main() {
 	fmt.Println("New project")
 	city := flag.String("city", "", "user`s city")
-	format := flag.Int64("format", 1, "wether output format")
+	format := flag.Int("format", 1, "wether output format")
 
 	flag.Parse()
 
 	fmt.Println(*city)
-	fmt.Println(*format)
-
-	r := strings.NewReader("Привет я поток данных")
-	block := make([]byte, 4)
-	for {
-		_, err := r.Read(block)
-		fmt.Printf("%q\n", block)
-		if err == io.EOF {
-			break
-		}
+	geoData, err := geo.GetMyLocation(*city)
+	if err != nil {
+		fmt.Println(err.Error())
 	}
+
+	fmt.Println(geoData)
+
+	wetherData := wether.GetWether(*geoData, *format)
+	fmt.Println(wetherData)
 }
